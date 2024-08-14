@@ -331,7 +331,7 @@ auto evaluate(
 
   Kokkos::parallel_for(
     results.size(), KOKKOS_LAMBDA(LO i) {
-      auto [elem_idx, coord] = results(i);
+      auto [dim, elem_idx, coord] = results(i);
       // TODO deal with case for elem_idx < 0 (point outside of mesh)
       KOKKOS_ASSERT(elem_idx >= 0);
       const auto elem_tri2verts =
@@ -371,7 +371,7 @@ auto evaluate(
 
   Kokkos::parallel_for(
     results.size(), KOKKOS_LAMBDA(LO i) {
-      auto [elem_idx, coord] = results(i);
+      auto [dim, elem_idx, coord] = results(i);
       // TODO deal with case for elem_idx < 0 (point outside of mesh)
       KOKKOS_ASSERT(elem_idx >= 0);
       const auto elem_tri2verts =
