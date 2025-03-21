@@ -258,9 +258,8 @@ OMEGA_H_INLINE double myreduce(const Omega_h::Vector<n> & x, Op op) OMEGA_H_NOEX
   return out;
 }         
 
-Kokkos::View<GridPointSearch::Result*> GridPointSearch::operator()(Kokkos::View<Real*[dim] > points) const
+Kokkos::View<GridPointSearch2D::Result*> GridPointSearch2D::operator()(Kokkos::View<Real*[DIM] > points) const
 {
-  static_assert(dim == 2, "point search assumes dim==2");
   Kokkos::View<GridPointSearch::Result*> results("point search result", points.extent(0));
   auto num_rows = candidate_map_.numRows();
   // needed so that we don't capture this ptr which will be memory error on cuda
@@ -353,7 +352,7 @@ Kokkos::View<GridPointSearch::Result*> GridPointSearch::operator()(Kokkos::View<
   return results;
 }
 
-GridPointSearch::GridPointSearch(Omega_h::Mesh& mesh, LO Nx, LO Ny)
+GridPointSearch<2>::GridPointSearch(Omega_h::Mesh& mesh, LO Nx, LO Ny)
 {
   auto mesh_bbox = Omega_h::get_bounding_box<2>(&mesh);
   auto grid_h = Kokkos::create_mirror_view(grid_);

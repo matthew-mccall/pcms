@@ -26,12 +26,10 @@ Omega_h::Vector<3> barycentric_from_global(
 [[nodiscard]] KOKKOS_FUNCTION bool triangle_intersects_bbox(
   const Omega_h::Matrix<2, 3>& coords, const AABBox<2>& bbox);
 
-class GridPointSearch
+template <int dim>
+class PointLocalizationSearch
 {
-  using CandidateMapT = Kokkos::Crs<LO, Kokkos::DefaultExecutionSpace, void, LO>;
-
 public:
-  static constexpr auto dim = 2;
   struct Result {
     enum class Dimensionality
     {
@@ -45,6 +43,25 @@ public:
     Omega_h::Vector<dim + 1> parametric_coords;
   };
 
+  static constexpr auto DIM = 2;
+
+  virtual Kokkos::View<Result*> operator()(Kokkos::View<Real*[dim] > point) const = 0;
+};
+
+template <int dim>
+class GridPointSearch : public PointLocalizationSearch<dim>
+{
+  static_assert(false, "Not implemented");
+};
+
+template <>
+class GridPointSearch<2> : public PointLocalizationSearch<2>
+{
+  using CandidateMapT = Kokkos::Crs<LO, Kokkos::DefaultExecutionSpace, void, LO>;
+
+public:
+  using Result = PointLocalizationSearch::Result;
+
   GridPointSearch(Omega_h::Mesh& mesh, LO Nx, LO Ny);
   /**
    *  given a point in global coordinates give the id of the triangle that the
@@ -53,7 +70,7 @@ public:
    * id will be a negative number and (TODO) will return a negative id of the
    * closest element
    */
-  Kokkos::View<Result*> operator()(Kokkos::View<Real*[dim] > point) const;
+  Kokkos::View<Result*> operator()(Kokkos::View<Real* [DIM]> point) const override;
 
 private:
   Omega_h::Mesh mesh_;
@@ -65,6 +82,8 @@ private:
   Omega_h::LOs tris2verts_;
   Omega_h::Reals coords_;
 };
+
+using GridPointSearch2D = GridPointSearch<2>;
 
 } // namespace detail
 #endif // PCMS_COUPLING_POINT_SEARCH_H
